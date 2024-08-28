@@ -9,31 +9,38 @@ const Category = () => {
 
     useEffect(() => {
         const fetchData =  async () => {
-            const response = await fetch('https://fakestoreapiserver.reactbd.com/walmart');
+            const response = await fetch('http://192.168.54.64:8000/api/v1/category/get');
             const data = await response.json();
-            setValue(data)
+            const category = data.data.category.map((list: any) => ({
+                id: list._id,
+                name: list.name,
+            }))
+            setValue(category)
+           
         }
         fetchData()
     }, [])
+
+    console.log("Cateory name", value)
   return (
     <View>
         <FlatList
-            keyExtractor={(item) => item._id.toString()}
+            keyExtractor={(item) => item.id}
             data={value}
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={({item}) => (
                 <View style={{backgroundColor: Color.primaryColor, 
                 borderRadius: 10, margin: 10, width: 80, alignItems: 'center',
-                paddingTop: 10,
+                paddingTop: 10
                 }}>
-                    <Pressable>
-                        <Text style={{ color: Color.white}}>{item.category}</Text>
+                    <Pressable style={{paddingHorizontal: 5}}>
+                        <Text style={{ color: Color.white, alignItems: 'center'}}>{item.name}</Text>
                     </Pressable>
                 </View>
             )}
         />
-        <FlatList
+        {/* <FlatList
             keyExtractor={(item) => item._id.toString()}
             data={value}
             horizontal
@@ -92,7 +99,7 @@ const Category = () => {
                     </View>
             
             )}
-        />
+        /> */}
     </View>
 
   )

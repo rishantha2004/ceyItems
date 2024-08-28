@@ -1,50 +1,64 @@
 import { View, Text, Image, TextInput, Button, Pressable, Alert } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-
+import axios from 'axios';
 
 const Login = () => {
   const navigation = useNavigation()
-  const usersData: { id: number, username: string, password: string}[] = [
-    {
-      id: 1, 
-      username: 'user1',
-      password: 'user01'
-    },
-    {
-      id: 2, 
-      username: 'user2',
-      password: 'user02'
-    },
-    {
-      id: 3, 
-      username: 'user2',
-      password: 'user03'
-    },
-  ]
+  // const usersData: { id: number, username: string, password: string}[] = [
+  //   {
+  //     id: 1, 
+  //     username: 'user1',
+  //     password: 'user01'
+  //   },
+  //   {
+  //     id: 2, 
+  //     username: 'user2',
+  //     password: 'user02'
+  //   },
+  //   {
+  //     id: 3, 
+  //     username: 'user2',
+  //     password: 'user03'
+  //   },
+  // ]
   type ErrorState = string | null;
 
-  const [isnotLogin, setIsNotLogin] = useState(true);
+  const [isnotLogin, setIsNotLogin] = useState();
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState<ErrorState>(null);
+  // const handleLogin = () => {
+  //   const user = usersData.find(
+  //     (element) => element.username.toLowerCase() === username.toLowerCase() && 
+  //     element.password.toLowerCase() === password.toLowerCase()
+  //   );
 
-  const handleLogin = () => {
-    const user = usersData.find(
-      (element) => element.username.toLowerCase() === username.toLowerCase() && 
-      element.password.toLowerCase() === password.toLowerCase()
-    );
-  console.log(user)
-  console.log(username, password)
-  if (user) {
-    navigation.navigate('Tabs')
-    setError(null)
-    setIsNotLogin(false)
-  } else {
-    setIsNotLogin(true)
-    setError('Invaild Username or Password!')
-  }
-  }
+  
+
+  const HandleSubmit = async () => {
+    try {
+        // Correctly send POST request with axios
+        const response = await axios.post('http://192.168.54.64:8000/api/v1/login/post', {
+            username,
+        });
+
+        // Access response data
+        const data = response.data;
+
+        if (data.isAdmin) {
+            Alert.alert('Success', 'Admin access granted');
+            navigation.navigate('AdminTabs');
+        } else {
+            navigation.navigate('Tabs');
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        Alert.alert('Error', 'Failed to login. Please try again.');
+    }
+};
+
+
   return (
     <View style={{ flex: 1, backgroundColor: 'red', height: '100%' }}>
       <View style={{ marginVertical: 80, gap: 16, alignItems: 'center'}}>
@@ -78,7 +92,7 @@ const Login = () => {
               <Text></Text>
             )}
           <View style={{ width: '80%', height: '70%', gap: 10 }}>
-            <Button title = 'Login' color='red' onPress={handleLogin} />
+            <Button title = 'Login' color='red' onPress={HandleSubmit} />
             <View style={{ gap: 1}}>
             <Pressable onPress={() => Alert.alert('Password Changed!')}>
              <Text style={{ color: 'blue'}}>Forget password?</Text>
